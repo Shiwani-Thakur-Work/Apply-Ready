@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JD-to-Resume Gap Analyzer</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --border: #2a2e38;
+    --text: #eef0f4;
+    --muted: #9aa1ac;
+    --accent: #6c8cff;
+    --good: #35c98f;
+    --mid: #f2b84b;
+    --bad: #f2554b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px 16px 80px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  .subhead { color: var(--muted); margin-top: 0; margin-bottom: 28px; font-size: 0.95rem; }
+  label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; }
+  textarea {
+    width: 100%;
+    min-height: 140px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    margin-bottom: 20px;
+  }
+  textarea:focus { outline: none; border-color: var(--accent); }
+  button {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: #0f1115;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  #results { margin-top: 32px; display: none; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .score-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+  .score-badge {
+    font-size: 1.4rem;
+    font-weight: 800;
+    padding: 6px 14px;
+    border-radius: 8px;
+  }
+  .score-good { background: rgba(53,201,143,0.15); color: var(--good); }
+  .score-mid { background: rgba(242,184,75,0.15); color: var(--mid); }
+  .score-bad { background: rgba(242,85,75,0.15); color: var(--bad); }
+  .fit-summary { color: var(--muted); font-size: 0.92rem; line-height: 1.5; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .chip {
+    background: rgba(108,140,255,0.15);
+    color: var(--accent);
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .bullet-block { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+  .bullet-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .bad-line, .good-line { display: flex; gap: 8px; margin-bottom: 6px; font-size: 0.9rem; line-height: 1.4; }
+  .issue-line { color: var(--muted); font-size: 0.85rem; margin: 4px 0 8px 26px; font-style: italic; }
+  h2.section-title { font-size: 1rem; margin: 0 0 14px; color: var(--text); }
+  #status { text-align: center; color: var(--muted); margin-top: 16px; font-size: 0.9rem; display: none; }
+  .error { color: var(--bad); text-align: center; margin-top: 16px; font-size: 0.9rem; display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>JD-to-Resume Gap Analyzer</h1>
+  <p class="subhead">Paste a job description and your resume. Get the exact gaps, weak bullets, and rewrites.</p>
+
+  <label for="jd">Job Description</label>
+  <textarea id="jd" placeholder="Paste the job description here..."></textarea>
+
+  <label for="resume">Your Resume</label>
+  <textarea id="resume" placeholder="Paste your resume text here..."></textarea>
+
+  <button id="analyzeBtn">Analyze Gap</button>
+  <p id="status">Analyzing...</p>
+  <p id="error" class="error"></p>
+
+  <div id="results">
+    <div class="card" id="scoreCard">
+      <div class="score-row">
+        <div class="score-badge" id="scoreBadge">-</div>
+        <strong>Fit Score</strong>
+      </div>
+      <p class="fit-summary" id="fitSummary"></p>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Missing Keywords</h2>
+      <div class="chips" id="keywordChips"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Bullets to Strengthen</h2>
+      <div id="bulletsContainer"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const btn = document.getElementById('analyzeBtn');
+const statusEl = document.getElementById('status');
+const errorEl = document.getElementById('error');
+const resultsEl = document.getElementById('results');
+
+btn.addEventListener('click', async () => {
+  const jd = document.getElementById('jd').value.trim();
+  const resume = document.getElementById('resume').value.trim();
+
+  errorEl.style.display = 'none';
+  resultsEl.style.display = 'none';
+
+  if (!jd || !resume) {
+    errorEl.textContent = 'Please paste both a job description and a resume.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  statusEl.style.display = 'block';
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jd, resume })
+    });
+
+    if (!res.ok) throw new Error('Server error: ' + res.status);
+    const data = await res.json();
+    renderResults(data);
+  } catch (err) {
+    errorEl.textContent = 'Something went wrong: ' + err.message;
+    errorEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    statusEl.style.display = 'none';
+  }
+});
+
+function renderResults(data) {
+  const scoreBadge = document.getElementById('scoreBadge');
+  const score = data.fit_score;
+  scoreBadge.textContent = score + '/10';
+  scoreBadge.className = 'score-badge ' + (score >= 7 ? 'score-good' : score >= 4 ? 'score-mid' : 'score-bad');
+
+  document.getElementById('fitSummary').textContent = data.fit_summary;
+
+  const chipsEl = document.getElementById('keywordChips');
+  chipsEl.innerHTML = '';
+  (data.missing_keywords || []).forEach(kw => {
+    const span = document.createElement('span');
+    span.className = 'chip';
+    span.textContent = kw;
+    chipsEl.appendChild(span);
+  });
+
+  const bulletsEl = document.getElementById('bulletsContainer');
+  bulletsEl.innerHTML = '';
+  (data.weak_bullets || []).forEach(b => {
+    const block = document.createElement('div');
+    block.className = 'bullet-block';
+    block.innerHTML = `
+      <div class="bad-line">❌ <span>${escapeHtml(b.original)}</span></div>
+      <div class="issue-line">⚠️ ${escapeHtml(b.issue)}</div>
+      <div class="good-line">✅ <span>${escapeHtml(b.rewrite)}</span></div>
+    `;
+    bulletsEl.appendChild(block);
+  });
+
+  resultsEl.style.display = 'block';
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>
