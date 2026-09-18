@@ -1,9 +1,9 @@
 # Personal notes - not part of the product
-UNDERSTANDING.md
+context.md
 
 # Vercel / environment
 .vercel
-.env
+.env*
 .env.local
 .env*.local
 
@@ -11,5 +11,5 @@ UNDERSTANDING.md
 .DS_Store
 Thumbs.db
 
-# Node (in case you ever add dependencies)
+# Node (in case I ever add dependencies)
 node_modules/
