@@ -4,6 +4,22 @@ A web tool that compares a job description against a resume, surfaces the gaps, 
 
 **Live demo:** [jd-to-resume-gap-analyzer.vercel.app](https://jd-to-resume-gap-analyzer.vercel.app)
 
+## Project Evolution
+
+This started as a small, focused v1 and grew based on actually using it:
+
+**v1 — Diagnose**
+Paste a job description and resume, get back missing keywords, weak bullet points, and a fit score. The goal was a fast, honest diagnostic — not just a generic match percentage.
+
+**v2 — Diagnose + Fix + Export**
+Using v1 surfaced an obvious next question: "okay, so now what do I do about it?" v2 closes that loop:
+- Upload a resume file directly (PDF/DOCX/TXT), not just paste
+- Generate a full improved resume based on the diagnosis, with an editable review step
+- Download the result as PDF or Word
+- Basic usage analytics to see if the tool is actually being used, not just visited
+
+See **Next Steps** below for where this goes from here.
+
 ## Why
 
 Most resume-JD comparisons are done manually, which means missed keywords and vague bullet points slip through unnoticed. This tool automates the comparison, flags specific gaps, and closes the loop by generating a rewritten resume — rather than stopping at a generic match score.
@@ -68,3 +84,12 @@ Most resume-JD comparisons are done manually, which means missed keywords and va
 - Resume rewrite is a full-document regeneration, not a targeted diff
 - PDF export uses plain text formatting rather than a styled resume template
 - Free-tier Gemini quota is limited to 20 requests/day per project
+
+## Next Steps (Future Scope)
+
+- **Rename** — the tool has grown past "gap analysis" into diagnose + rewrite + export, so a name change (candidates under consideration: Resume Fit Analyzer, JD Match & Rewrite, ApplyReady, FitCheck) better reflects the full flow
+- Persistent history so users can revisit past analyses
+- Styled PDF export using an actual resume template instead of plain text
+- Targeted bullet-level rewrite diffs instead of full-resume regeneration, to reduce unintended changes elsewhere in the document
+- UI polish: light/dark mode toggle, smoother loading states, mobile layout refinement
+- Side-by-side before/after resume view instead of a single editable textarea

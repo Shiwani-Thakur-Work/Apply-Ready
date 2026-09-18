@@ -408,6 +408,84 @@
     .header-links a:hover {
       color: var(--accent);
     }
+
+    .header-links button.about-link {
+      background: none;
+      border: none;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+      width: auto;
+    }
+
+    .header-links button.about-link:hover {
+      color: var(--accent);
+    }
+
+    .version-panel {
+      max-width: 720px;
+      margin: 0 auto 28px;
+      display: none;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .version-panel-intro {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin: 0 0 18px;
+      line-height: 1.5;
+    }
+
+    .version-entry {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .version-entry:last-child {
+      margin-bottom: 0;
+    }
+
+    .version-badge {
+      flex-shrink: 0;
+      width: 52px;
+      height: 26px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .v-done {
+      background: rgba(53, 201, 143, 0.15);
+      color: var(--good);
+    }
+
+    .v-next {
+      background: rgba(242, 184, 75, 0.15);
+      color: var(--mid);
+    }
+
+    .version-entry h4 {
+      margin: 0 0 4px;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    .version-entry p {
+      margin: 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
   </style>
 </head>
 
@@ -421,10 +499,44 @@
       </div>
     </div>
     <div class="header-links">
+      <button type="button" class="about-link" id="aboutToggle">About ▾</button>
       <a href="https://github.com/Shiwani-Thakur-Work" target="_blank" rel="noopener">GitHub</a>
       <a href="https://www.linkedin.com/in/shiwani-thakur/" target="_blank" rel="noopener">LinkedIn</a>
     </div>
   </header>
+
+  <div class="version-panel" id="versionPanel">
+    <p class="version-panel-intro">This tool started as a simple diagnostic and grew based on actually using it. Here's
+      how it's evolved:</p>
+
+    <div class="version-entry">
+      <div class="version-badge v-done">v1.0</div>
+      <div>
+        <h4>Diagnose</h4>
+        <p>Paste a job description and resume, get missing keywords, weak bullet points, and an honest fit score —
+          instead of a vague match percentage.</p>
+      </div>
+    </div>
+
+    <div class="version-entry">
+      <div class="version-badge v-done">v2.0</div>
+      <div>
+        <h4>Diagnose + Fix + Export</h4>
+        <p>Upload a resume file directly (PDF/DOCX/TXT), generate a full improved resume from the diagnosis with an
+          editable review step, and download it as PDF or Word.</p>
+      </div>
+    </div>
+
+    <div class="version-entry">
+      <div class="version-badge v-next">Next</div>
+      <div>
+        <h4>Polish + Rename</h4>
+        <p>A name that better reflects the full flow, a styled resume template for exports, a side-by-side before/after
+          view, and general UI refinements.</p>
+      </div>
+    </div>
+  </div>
+
   <div class="wrap">
     <h1>JD-to-Resume Gap Analyzer</h1>
     <p class="subhead">Paste a job description and your resume. Get the exact gaps, weak bullets, and rewrites.</p>
@@ -484,7 +596,7 @@
   </div>
 
   <footer>
-    Built as a personal/portfolio project · <a href="mailto:shiwani.thakur.work@gmail.com">Get in touch</a>
+    Built as a portfolio project · <a href="mailto:YOUR_EMAIL_HERE">Get in touch</a>
   </footer>
 
   <script>
@@ -724,6 +836,15 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    });
+
+    // --- About / version history toggle ---
+    const aboutToggle = document.getElementById('aboutToggle');
+    const versionPanel = document.getElementById('versionPanel');
+    aboutToggle.addEventListener('click', () => {
+      const isOpen = versionPanel.style.display === 'block';
+      versionPanel.style.display = isOpen ? 'none' : 'block';
+      aboutToggle.textContent = isOpen ? 'About ▾' : 'About ▴';
     });
   </script>
 </body>
