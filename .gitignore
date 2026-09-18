@@ -1,2 +1,15 @@
+# Personal notes - not part of the product
+UNDERSTANDING.md
+
+# Vercel / environment
 .vercel
-.env*
+.env
+.env.local
+.env*.local
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+
+# Node (in case you ever add dependencies)
+node_modules/
