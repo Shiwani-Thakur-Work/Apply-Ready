@@ -55,6 +55,6 @@ Most resume-JD comparisons are done manually, which means missed keywords and va
 - No saved history across sessions
 - Single resume/JD comparison per run
 
-## License
+**Live demo:** 
 
-MIT
+[jd-to-resume-gap-analyzer.vercel.app](https://jd-to-resume-gap-analyzer.vercel.app)

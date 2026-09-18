@@ -1,211 +1,626 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JD-to-Resume Gap Analyzer</title>
-<style>
-  :root {
-    --bg: #0f1115;
-    --panel: #171a21;
-    --border: #2a2e38;
-    --text: #eef0f4;
-    --muted: #9aa1ac;
-    --accent: #6c8cff;
-    --good: #35c98f;
-    --mid: #f2b84b;
-    --bad: #f2554b;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    padding: 32px 16px 80px;
-  }
-  .wrap { max-width: 720px; margin: 0 auto; }
-  h1 { font-size: 1.5rem; margin-bottom: 4px; }
-  .subhead { color: var(--muted); margin-top: 0; margin-bottom: 28px; font-size: 0.95rem; }
-  label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; }
-  textarea {
-    width: 100%;
-    min-height: 140px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    padding: 12px 14px;
-    font-size: 0.9rem;
-    font-family: inherit;
-    resize: vertical;
-    margin-bottom: 20px;
-  }
-  textarea:focus { outline: none; border-color: var(--accent); }
-  button {
-    width: 100%;
-    padding: 14px;
-    background: var(--accent);
-    color: #0f1115;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-  }
-  button:disabled { opacity: 0.6; cursor: not-allowed; }
-  #results { margin-top: 32px; display: none; }
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
-  }
-  .score-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
-  .score-badge {
-    font-size: 1.4rem;
-    font-weight: 800;
-    padding: 6px 14px;
-    border-radius: 8px;
-  }
-  .score-good { background: rgba(53,201,143,0.15); color: var(--good); }
-  .score-mid { background: rgba(242,184,75,0.15); color: var(--mid); }
-  .score-bad { background: rgba(242,85,75,0.15); color: var(--bad); }
-  .fit-summary { color: var(--muted); font-size: 0.92rem; line-height: 1.5; }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-  .chip {
-    background: rgba(108,140,255,0.15);
-    color: var(--accent);
-    padding: 5px 12px;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
-  .bullet-block { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
-  .bullet-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-  .bad-line, .good-line { display: flex; gap: 8px; margin-bottom: 6px; font-size: 0.9rem; line-height: 1.4; }
-  .issue-line { color: var(--muted); font-size: 0.85rem; margin: 4px 0 8px 26px; font-style: italic; }
-  h2.section-title { font-size: 1rem; margin: 0 0 14px; color: var(--text); }
-  #status { text-align: center; color: var(--muted); margin-top: 16px; font-size: 0.9rem; display: none; }
-  .error { color: var(--bad); text-align: center; margin-top: 16px; font-size: 0.9rem; display: none; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JD-to-Resume Gap Analyzer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html-docx-js/dist/html-docx.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --border: #2a2e38;
+      --text: #eef0f4;
+      --muted: #9aa1ac;
+      --accent: #6c8cff;
+      --good: #35c98f;
+      --mid: #f2b84b;
+      --bad: #f2554b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 32px 16px 80px;
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 4px;
+    }
+
+    .subhead {
+      color: var(--muted);
+      margin-top: 0;
+      margin-bottom: 28px;
+      font-size: 0.95rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 12px 14px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      resize: vertical;
+      margin-bottom: 20px;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #0f1115;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #results {
+      margin-top: 32px;
+      display: none;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .score-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .score-badge {
+      font-size: 1.4rem;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 8px;
+    }
+
+    .score-good {
+      background: rgba(53, 201, 143, 0.15);
+      color: var(--good);
+    }
+
+    .score-mid {
+      background: rgba(242, 184, 75, 0.15);
+      color: var(--mid);
+    }
+
+    .score-bad {
+      background: rgba(242, 85, 75, 0.15);
+      color: var(--bad);
+    }
+
+    .fit-summary {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .chip {
+      background: rgba(108, 140, 255, 0.15);
+      color: var(--accent);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .bullet-block {
+      margin-bottom: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .bullet-block:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .bad-line,
+    .good-line {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .issue-line {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin: 4px 0 8px 26px;
+      font-style: italic;
+    }
+
+    h2.section-title {
+      font-size: 1rem;
+      margin: 0 0 14px;
+      color: var(--text);
+    }
+
+    #status {
+      text-align: center;
+      color: var(--muted);
+      margin-top: 16px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .error {
+      color: var(--bad);
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .secondary-btn {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      margin-top: 8px;
+    }
+
+    #rewriteSection {
+      margin-top: 20px;
+      display: none;
+    }
+
+    #rewriteStatus {
+      text-align: center;
+      color: var(--muted);
+      margin-top: 12px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    #rewriteTextarea {
+      width: 100%;
+      min-height: 320px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 14px;
+      font-size: 0.85rem;
+      font-family: ui-monospace, "SF Mono", Consolas, monospace;
+      line-height: 1.5;
+      resize: vertical;
+      margin-top: 14px;
+    }
+
+    .download-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .download-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+    }
+
+    .pdf-btn {
+      background: var(--good);
+      color: #0f1115;
+    }
+
+    .word-btn {
+      background: transparent;
+      border: 1px solid var(--good);
+      color: var(--good);
+    }
+
+    .review-note {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    .upload-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .upload-btn {
+      width: auto;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: transparent;
+      border: 1px dashed var(--border);
+      color: var(--muted);
+    }
+
+    .upload-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .file-name {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .or-divider {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin: 2px 0 10px;
+    }
+
+    .parse-status {
+      font-size: 0.82rem;
+      color: var(--accent);
+      margin-bottom: 8px;
+      display: none;
+    }
+  </style>
 </head>
+
 <body>
-<div class="wrap">
-  <h1>JD-to-Resume Gap Analyzer</h1>
-  <p class="subhead">Paste a job description and your resume. Get the exact gaps, weak bullets, and rewrites.</p>
+  <div class="wrap">
+    <h1>JD-to-Resume Gap Analyzer</h1>
+    <p class="subhead">Paste a job description and your resume. Get the exact gaps, weak bullets, and rewrites.</p>
 
-  <label for="jd">Job Description</label>
-  <textarea id="jd" placeholder="Paste the job description here..."></textarea>
+    <label for="jd">Job Description</label>
+    <textarea id="jd" placeholder="Paste the job description here..."></textarea>
 
-  <label for="resume">Your Resume</label>
-  <textarea id="resume" placeholder="Paste your resume text here..."></textarea>
+    <label for="resume">Your Resume</label>
+    <div class="upload-row">
+      <button type="button" class="upload-btn" id="uploadBtn">Upload File (PDF, Word, TXT)</button>
+      <input type="file" id="fileInput" accept=".pdf,.docx,.txt" style="display:none;">
+      <span class="file-name" id="fileName"></span>
+    </div>
+    <p class="or-divider">— or paste directly below —</p>
+    <p class="parse-status" id="parseStatus">Reading file...</p>
+    <textarea id="resume" placeholder="Paste your resume text here..."></textarea>
 
-  <button id="analyzeBtn">Analyze Gap</button>
-  <p id="status">Analyzing...</p>
-  <p id="error" class="error"></p>
+    <button id="analyzeBtn">Analyze Gap</button>
+    <p id="status">Analyzing...</p>
+    <p id="error" class="error"></p>
 
-  <div id="results">
-    <div class="card" id="scoreCard">
-      <div class="score-row">
-        <div class="score-badge" id="scoreBadge">-</div>
-        <strong>Fit Score</strong>
+    <div id="results">
+      <div class="card" id="scoreCard">
+        <div class="score-row">
+          <div class="score-badge" id="scoreBadge">-</div>
+          <strong>Fit Score</strong>
+        </div>
+        <p class="fit-summary" id="fitSummary"></p>
       </div>
-      <p class="fit-summary" id="fitSummary"></p>
-    </div>
 
-    <div class="card">
-      <h2 class="section-title">Missing Keywords</h2>
-      <div class="chips" id="keywordChips"></div>
-    </div>
+      <div class="card">
+        <h2 class="section-title">Missing Keywords</h2>
+        <div class="chips" id="keywordChips"></div>
+      </div>
 
-    <div class="card">
-      <h2 class="section-title">Bullets to Strengthen</h2>
-      <div id="bulletsContainer"></div>
+      <div class="card">
+        <h2 class="section-title">Bullets to Strengthen</h2>
+        <div id="bulletsContainer"></div>
+      </div>
+
+      <button id="generateResumeBtn" class="secondary-btn">Generate Improved Resume</button>
+      <p id="rewriteStatus">Rewriting your resume...</p>
+
+      <div id="rewriteSection" class="card">
+        <h2 class="section-title">Improved Resume (review before downloading)</h2>
+        <p class="review-note">This is AI-generated — review it carefully. Fix anything that sounds off before
+          downloading, especially if you plan to use the PDF as-is.</p>
+        <textarea id="rewriteTextarea"></textarea>
+        <div class="download-row">
+          <button id="downloadPdfBtn" class="download-btn pdf-btn">Download as PDF</button>
+          <button id="downloadWordBtn" class="download-btn word-btn">Download as Word</button>
+        </div>
+        <p class="review-note">PDF: use when it looks good as-is. Word: use when you want to manually tweak formatting
+          or wording afterward.</p>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-const btn = document.getElementById('analyzeBtn');
-const statusEl = document.getElementById('status');
-const errorEl = document.getElementById('error');
-const resultsEl = document.getElementById('results');
+  <script>
+    const btn = document.getElementById('analyzeBtn');
+    const statusEl = document.getElementById('status');
+    const errorEl = document.getElementById('error');
+    const resultsEl = document.getElementById('results');
 
-btn.addEventListener('click', async () => {
-  const jd = document.getElementById('jd').value.trim();
-  const resume = document.getElementById('resume').value.trim();
+    let currentJd = '';
+    let currentResume = '';
+    let currentAnalysis = null;
 
-  errorEl.style.display = 'none';
-  resultsEl.style.display = 'none';
+    // --- Resume file upload (PDF, DOCX, TXT) ---
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
 
-  if (!jd || !resume) {
-    errorEl.textContent = 'Please paste both a job description and a resume.';
-    errorEl.style.display = 'block';
-    return;
-  }
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('fileInput');
+    const fileNameEl = document.getElementById('fileName');
+    const parseStatusEl = document.getElementById('parseStatus');
+    const resumeTextarea = document.getElementById('resume');
 
-  btn.disabled = true;
-  statusEl.style.display = 'block';
+    uploadBtn.addEventListener('click', () => fileInput.click());
 
-  try {
-    const res = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jd, resume })
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      fileNameEl.textContent = file.name;
+      errorEl.style.display = 'none';
+      parseStatusEl.style.display = 'block';
+      parseStatusEl.textContent = 'Reading file...';
+
+      try {
+        const ext = file.name.split('.').pop().toLowerCase();
+        let text = '';
+
+        if (ext === 'txt') {
+          text = await file.text();
+        } else if (ext === 'docx') {
+          const arrayBuffer = await file.arrayBuffer();
+          const result = await window.mammoth.extractRawText({ arrayBuffer });
+          text = result.value;
+        } else if (ext === 'pdf') {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          const pageTexts = [];
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            const pageText = content.items.map(item => item.str).join(' ');
+            pageTexts.push(pageText);
+          }
+          text = pageTexts.join('\n\n');
+        } else {
+          throw new Error('Unsupported file type. Please use PDF, DOCX, or TXT.');
+        }
+
+        if (!text.trim()) {
+          throw new Error('Could not extract any text from this file. Try pasting instead.');
+        }
+
+        resumeTextarea.value = text.trim();
+        parseStatusEl.textContent = `Loaded from ${file.name} — feel free to edit below.`;
+      } catch (err) {
+        parseStatusEl.style.display = 'none';
+        errorEl.textContent = 'Could not read file: ' + err.message;
+        errorEl.style.display = 'block';
+        fileNameEl.textContent = '';
+      }
     });
 
-    if (!res.ok) throw new Error('Server error: ' + res.status);
-    const data = await res.json();
-    renderResults(data);
-  } catch (err) {
-    errorEl.textContent = 'Something went wrong: ' + err.message;
-    errorEl.style.display = 'block';
-  } finally {
-    btn.disabled = false;
-    statusEl.style.display = 'none';
-  }
-});
+    btn.addEventListener('click', async () => {
+      const jd = document.getElementById('jd').value.trim();
+      const resume = document.getElementById('resume').value.trim();
 
-function renderResults(data) {
-  const scoreBadge = document.getElementById('scoreBadge');
-  const score = data.fit_score;
-  scoreBadge.textContent = score + '/10';
-  scoreBadge.className = 'score-badge ' + (score >= 7 ? 'score-good' : score >= 4 ? 'score-mid' : 'score-bad');
+      errorEl.style.display = 'none';
+      resultsEl.style.display = 'none';
+      document.getElementById('rewriteSection').style.display = 'none';
 
-  document.getElementById('fitSummary').textContent = data.fit_summary;
+      if (!jd || !resume) {
+        errorEl.textContent = 'Please paste both a job description and a resume.';
+        errorEl.style.display = 'block';
+        return;
+      }
 
-  const chipsEl = document.getElementById('keywordChips');
-  chipsEl.innerHTML = '';
-  (data.missing_keywords || []).forEach(kw => {
-    const span = document.createElement('span');
-    span.className = 'chip';
-    span.textContent = kw;
-    chipsEl.appendChild(span);
-  });
+      btn.disabled = true;
+      statusEl.style.display = 'block';
 
-  const bulletsEl = document.getElementById('bulletsContainer');
-  bulletsEl.innerHTML = '';
-  (data.weak_bullets || []).forEach(b => {
-    const block = document.createElement('div');
-    block.className = 'bullet-block';
-    block.innerHTML = `
+      try {
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jd, resume })
+        });
+
+        if (!res.ok) throw new Error('Server error: ' + res.status);
+        const data = await res.json();
+
+        currentJd = jd;
+        currentResume = resume;
+        currentAnalysis = data;
+
+        if (window.va) window.va('event', { name: 'analyze_gap_used' });
+
+        renderResults(data);
+      } catch (err) {
+        errorEl.textContent = 'Something went wrong: ' + err.message;
+        errorEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        statusEl.style.display = 'none';
+      }
+    });
+
+    function renderResults(data) {
+      const scoreBadge = document.getElementById('scoreBadge');
+      const score = data.fit_score;
+      scoreBadge.textContent = score + '/10';
+      scoreBadge.className = 'score-badge ' + (score >= 7 ? 'score-good' : score >= 4 ? 'score-mid' : 'score-bad');
+
+      document.getElementById('fitSummary').textContent = data.fit_summary;
+
+      const chipsEl = document.getElementById('keywordChips');
+      chipsEl.innerHTML = '';
+      (data.missing_keywords || []).forEach(kw => {
+        const span = document.createElement('span');
+        span.className = 'chip';
+        span.textContent = kw;
+        chipsEl.appendChild(span);
+      });
+
+      const bulletsEl = document.getElementById('bulletsContainer');
+      bulletsEl.innerHTML = '';
+      (data.weak_bullets || []).forEach(b => {
+        const block = document.createElement('div');
+        block.className = 'bullet-block';
+        block.innerHTML = `
       <div class="bad-line">❌ <span>${escapeHtml(b.original)}</span></div>
       <div class="issue-line">⚠️ ${escapeHtml(b.issue)}</div>
       <div class="good-line">✅ <span>${escapeHtml(b.rewrite)}</span></div>
     `;
-    bulletsEl.appendChild(block);
-  });
+        bulletsEl.appendChild(block);
+      });
 
-  resultsEl.style.display = 'block';
-}
+      resultsEl.style.display = 'block';
+    }
 
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-</script>
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // --- Resume rewrite ---
+    const generateBtn = document.getElementById('generateResumeBtn');
+    const rewriteStatus = document.getElementById('rewriteStatus');
+    const rewriteSection = document.getElementById('rewriteSection');
+    const rewriteTextarea = document.getElementById('rewriteTextarea');
+
+    generateBtn.addEventListener('click', async () => {
+      if (!currentAnalysis) return;
+
+      generateBtn.disabled = true;
+      rewriteStatus.style.display = 'block';
+      rewriteSection.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/rewrite', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resume: currentResume, jd: currentJd, analysis: currentAnalysis })
+        });
+
+        if (!res.ok) throw new Error('Server error: ' + res.status);
+        const data = await res.json();
+
+        rewriteTextarea.value = data.rewritten_resume;
+        rewriteSection.style.display = 'block';
+      } catch (err) {
+        errorEl.textContent = 'Could not generate improved resume: ' + err.message;
+        errorEl.style.display = 'block';
+      } finally {
+        generateBtn.disabled = false;
+        rewriteStatus.style.display = 'none';
+      }
+    });
+
+    // --- Download as PDF ---
+    document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+      const text = rewriteTextarea.value;
+      const margin = 48;
+      const maxWidth = 612 - margin * 2;
+      const lines = doc.splitTextToSize(text, maxWidth);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10.5);
+
+      let y = margin;
+      const lineHeight = 14;
+      const pageHeight = 792;
+
+      lines.forEach(line => {
+        if (y > pageHeight - margin) {
+          doc.addPage();
+          y = margin;
+        }
+        doc.text(line, margin, y);
+        y += lineHeight;
+      });
+
+      doc.save('improved-resume.pdf');
+    });
+
+    // --- Download as Word ---
+    document.getElementById('downloadWordBtn').addEventListener('click', () => {
+      const text = rewriteTextarea.value;
+      const htmlLines = text.split('\n').map(line => `<p>${escapeHtml(line) || '&nbsp;'}</p>`).join('');
+      const htmlContent = `
+    <html>
+      <head><meta charset="utf-8"></head>
+      <body style="font-family: Calibri, Arial, sans-serif; font-size: 11pt;">
+        ${htmlLines}
+      </body>
+    </html>`;
+
+      const converted = window.htmlDocx.asBlob(htmlContent);
+      const url = URL.createObjectURL(converted);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'improved-resume.doc';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  </script>
 </body>
+
 </html>
