@@ -1,23 +1,35 @@
 # JD-to-Resume Gap Analyzer
 
-A lightweight web tool that compares a job description against a resume and surfaces the gaps — missing keywords, weak bullet points, and rewrite suggestions — to help candidates tailor their applications more effectively.
+A web tool that compares a job description against a resume, surfaces the gaps, and generates an improved, downloadable version of the resume.
+
+**Live demo:** [jd-to-resume-gap-analyzer.vercel.app](https://jd-to-resume-gap-analyzer.vercel.app)
 
 ## Why
 
-Most resume-JD comparisons are done manually, which means missed keywords and vague bullet points slip through unnoticed. This tool automates that comparison and gives specific, actionable feedback instead of a generic match score.
+Most resume-JD comparisons are done manually, which means missed keywords and vague bullet points slip through unnoticed. This tool automates the comparison, flags specific gaps, and closes the loop by generating a rewritten resume — rather than stopping at a generic match score.
 
 ## Features
 
-- Paste a job description and resume, get instant analysis
-- Highlights missing keywords/skills relevant to the role
-- Flags weak bullet points with specific rewrite suggestions
+**Analysis**
+- Upload a resume (PDF, DOCX, or TXT) or paste it directly
+- Instant gap analysis against a pasted job description
+- Missing keywords/skills relevant to the role
+- Weak bullet points flagged with specific rewrite suggestions
 - Overall fit score with a short summary
+
+**Resume rewrite**
+- One-click generation of a full improved resume based on the gap analysis
+- Editable review step before export — AI output is meant to be checked, not blindly trusted
+- Download as PDF (ready to send) or Word (for further manual edits)
 
 ## Tech Stack
 
 - **Frontend:** HTML, CSS, vanilla JavaScript
-- **Backend:** Vercel serverless function (Node.js)
-- **AI:** Google Gemini API (2.5 Flash)
+- **Backend:** Vercel serverless functions (Node.js)
+- **AI:** Google Gemini API (`gemini-3.6-flash`)
+- **File parsing:** pdf.js (PDF), mammoth.js (DOCX)
+- **Export:** jsPDF (PDF), html-docx-js (Word)
+- **Analytics:** Vercel Web Analytics
 - **Hosting:** Vercel
 
 ## Setup
@@ -30,7 +42,7 @@ Most resume-JD comparisons are done manually, which means missed keywords and va
 
 2. Get a free Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
 
-3. Deploy to Vercel and add the API key as an environment variable:
+3. Deploy to Vercel and add the API key as an environment variable (enable it for Production, Preview, and Development):
    - Variable name: `GEMINI_API_KEY`
    - Value: your key from step 2
 
@@ -45,16 +57,14 @@ Most resume-JD comparisons are done manually, which means missed keywords and va
 ```
 ├── index.html          # Frontend UI
 ├── api/
-│   └── analyze.js      # Serverless function calling the Gemini API
+│   ├── analyze.js      # Gap analysis — calls the Gemini API
+│   └── rewrite.js       # Resume rewrite — calls the Gemini API
 └── package.json
 ```
 
 ## Roadmap / Known Limitations
 
-- Paste-only input (no file upload yet)
-- No saved history across sessions
-- Single resume/JD comparison per run
-
-**Live demo:** 
-
-[jd-to-resume-gap-analyzer.vercel.app](https://jd-to-resume-gap-analyzer.vercel.app)
+- Single resume/JD comparison per run — no saved history across sessions
+- Resume rewrite is a full-document regeneration, not a targeted diff
+- PDF export uses plain text formatting rather than a styled resume template
+- Free-tier Gemini quota is limited to 20 requests/day per project
