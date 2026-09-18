@@ -1,4 +1,6 @@
-# JD-to-Resume Gap Analyzer
+# ApplyReady
+
+*(formerly "JD-to-Resume Gap Analyzer")*
 
 A web tool that compares a job description against a resume, surfaces the gaps, and generates an improved, downloadable version of the resume.
 
@@ -17,6 +19,9 @@ Using v1 surfaced an obvious next question: "okay, so now what do I do about it?
 - Generate a full improved resume based on the diagnosis, with an editable review step
 - Download the result as PDF or Word
 - Basic usage analytics to see if the tool is actually being used, not just visited
+
+**v3 — Rebrand: ApplyReady**
+Renamed from "JD-to-Resume Gap Analyzer" to **ApplyReady** — the tool had grown past pure gap-analysis into a full diagnose-and-fix experience, so the name needed to catch up. Also added a light/dark mode toggle.
 
 See **Next Steps** below for where this goes from here.
 
@@ -38,6 +43,10 @@ Most resume-JD comparisons are done manually, which means missed keywords and va
 - Editable review step before export — AI output is meant to be checked, not blindly trusted
 - Download as PDF (ready to send) or Word (for further manual edits)
 
+**UI**
+- Light/dark mode toggle, respects system preference by default, remembers your choice
+- In-app "About" popup with a quick project summary — the full version history lives in this README
+
 ## Tech Stack
 
 - **Frontend:** HTML, CSS, vanilla JavaScript
@@ -53,7 +62,7 @@ Most resume-JD comparisons are done manually, which means missed keywords and va
 1. Clone the repo
    ```
    git clone <your-repo-url>
-   cd gap-analyzer
+   cd applyready
    ```
 
 2. Get a free Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
@@ -87,9 +96,8 @@ Most resume-JD comparisons are done manually, which means missed keywords and va
 
 ## Next Steps (Future Scope)
 
-- **Rename** — the tool has grown past "gap analysis" into diagnose + rewrite + export, so a name change (candidates under consideration: Resume Fit Analyzer, JD Match & Rewrite, ApplyReady, FitCheck) better reflects the full flow
 - Persistent history so users can revisit past analyses
 - Styled PDF export using an actual resume template instead of plain text
 - Targeted bullet-level rewrite diffs instead of full-resume regeneration, to reduce unintended changes elsewhere in the document
-- UI polish: light/dark mode toggle, smoother loading states, mobile layout refinement
 - Side-by-side before/after resume view instead of a single editable textarea
+- Smoother loading states and mobile layout refinement

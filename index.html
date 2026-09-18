@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JD-to-Resume Gap Analyzer</title>
+  <title>ApplyReady — Resume Gap Analysis & Rewrite</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html-docx-js/dist/html-docx.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
@@ -26,6 +26,18 @@
       --bad: #f2554b;
     }
 
+    html[data-theme="light"] {
+      --bg: #f5f6f8;
+      --panel: #ffffff;
+      --border: #e2e4e9;
+      --text: #14161a;
+      --muted: #5b6270;
+      --accent: #4a63d6;
+      --good: #1f9d6c;
+      --mid: #b8790a;
+      --bad: #d1372e;
+    }
+
     * {
       box-sizing: border-box;
     }
@@ -36,6 +48,7 @@
       background: var(--bg);
       color: var(--text);
       padding: 32px 16px 80px;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     .wrap {
@@ -425,66 +438,90 @@
       color: var(--accent);
     }
 
-    .version-panel {
-      max-width: 720px;
-      margin: 0 auto 28px;
-      display: none;
-      background: var(--panel);
+    .theme-toggle-btn {
+      background: none;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-    }
-
-    .version-panel-intro {
-      color: var(--muted);
-      font-size: 0.88rem;
-      margin: 0 0 18px;
-      line-height: 1.5;
-    }
-
-    .version-entry {
-      display: flex;
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-
-    .version-entry:last-child {
-      margin-bottom: 0;
-    }
-
-    .version-badge {
-      flex-shrink: 0;
-      width: 52px;
-      height: 26px;
-      border-radius: 6px;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 800;
+      cursor: pointer;
+      padding: 0;
+      color: var(--muted);
     }
 
-    .v-done {
-      background: rgba(53, 201, 143, 0.15);
-      color: var(--good);
+    .theme-toggle-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
-    .v-next {
-      background: rgba(242, 184, 75, 0.15);
-      color: var(--mid);
+    .theme-toggle-btn svg {
+      width: 16px;
+      height: 16px;
     }
 
-    .version-entry h4 {
-      margin: 0 0 4px;
-      font-size: 0.88rem;
+    /* About modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      max-width: 480px;
+      width: 100%;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: auto;
+      padding: 4px 8px;
+    }
+
+    .modal-close:hover {
       color: var(--text);
     }
 
-    .version-entry p {
-      margin: 0;
-      font-size: 0.82rem;
+    .modal-box h3 {
+      margin: 0 0 4px;
+      font-size: 1.15rem;
+    }
+
+    .modal-box .modal-tagline {
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 0 0 16px;
+    }
+
+    .modal-box p {
       color: var(--muted);
-      line-height: 1.5;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin: 0 0 14px;
+    }
+
+    .modal-box p:last-child {
+      margin-bottom: 0;
     }
   </style>
 </head>
@@ -499,46 +536,28 @@
       </div>
     </div>
     <div class="header-links">
-      <button type="button" class="about-link" id="aboutToggle">About ▾</button>
       <a href="https://github.com/Shiwani-Thakur-Work" target="_blank" rel="noopener">GitHub</a>
       <a href="https://www.linkedin.com/in/shiwani-thakur/" target="_blank" rel="noopener">LinkedIn</a>
+      <button type="button" class="about-link" id="aboutToggle">About</button>
+      <button type="button" class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme"></button>
     </div>
   </header>
 
-  <div class="version-panel" id="versionPanel">
-    <p class="version-panel-intro">This tool started as a simple diagnostic and grew based on actually using it. Here's
-      how it's evolved:</p>
-
-    <div class="version-entry">
-      <div class="version-badge v-done">v1.0</div>
-      <div>
-        <h4>Diagnose</h4>
-        <p>Paste a job description and resume, get missing keywords, weak bullet points, and an honest fit score —
-          instead of a vague match percentage.</p>
-      </div>
-    </div>
-
-    <div class="version-entry">
-      <div class="version-badge v-done">v2.0</div>
-      <div>
-        <h4>Diagnose + Fix + Export</h4>
-        <p>Upload a resume file directly (PDF/DOCX/TXT), generate a full improved resume from the diagnosis with an
-          editable review step, and download it as PDF or Word.</p>
-      </div>
-    </div>
-
-    <div class="version-entry">
-      <div class="version-badge v-next">Next</div>
-      <div>
-        <h4>Polish + Rename</h4>
-        <p>A name that better reflects the full flow, a styled resume template for exports, a side-by-side before/after
-          view, and general UI refinements.</p>
-      </div>
+  <div class="modal-overlay" id="aboutModal">
+    <div class="modal-box">
+      <button type="button" class="modal-close" id="aboutClose">✕</button>
+      <h3>ApplyReady</h3>
+      <p class="modal-tagline">From gap analysis to a ready-to-send resume.</p>
+      <p>ApplyReady started as a simple idea: instead of manually comparing a resume against a job description, let AI
+        point out exactly what's missing — specific keywords, weak bullet points, and an honest fit score.</p>
+      <p>It's grown into a full loop: upload a resume, see the gaps, generate an improved version, review it, and
+        download it as a PDF or Word document — all in one place.</p>
+      <p> Few more features will be added soon :)</p>
     </div>
   </div>
 
   <div class="wrap">
-    <h1>JD-to-Resume Gap Analyzer</h1>
+    <h1>ApplyReady</h1>
     <p class="subhead">Paste a job description and your resume. Get the exact gaps, weak bullets, and rewrites.</p>
 
     <label for="jd">Job Description</label>
@@ -596,7 +615,7 @@
   </div>
 
   <footer>
-    Built as a portfolio project · <a href="mailto:YOUR_EMAIL_HERE">Get in touch</a>
+    Built as a personal/portfolio project · <a href="mailto:shiwani.thakur.work@gmail.com">Get in touch</a>
   </footer>
 
   <script>
@@ -608,6 +627,45 @@
     let currentJd = '';
     let currentResume = '';
     let currentAnalysis = null;
+
+    // --- Theme toggle (light/dark) with SVG icons ---
+    const themeToggle = document.getElementById('themeToggle');
+    const htmlEl = document.documentElement;
+
+    const sunIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`;
+    const moonIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        htmlEl.setAttribute('data-theme', 'light');
+        themeToggle.innerHTML = moonIcon;
+      } else {
+        htmlEl.removeAttribute('data-theme');
+        themeToggle.innerHTML = sunIcon;
+      }
+    }
+
+    const savedTheme = localStorage.getItem('applyready-theme') ||
+      (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    applyTheme(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+      const isLight = htmlEl.getAttribute('data-theme') === 'light';
+      const next = isLight ? 'dark' : 'light';
+      applyTheme(next);
+      localStorage.setItem('applyready-theme', next);
+    });
+
+    // --- About modal ---
+    const aboutToggle = document.getElementById('aboutToggle');
+    const aboutModal = document.getElementById('aboutModal');
+    const aboutClose = document.getElementById('aboutClose');
+
+    aboutToggle.addEventListener('click', () => { aboutModal.style.display = 'flex'; });
+    aboutClose.addEventListener('click', () => { aboutModal.style.display = 'none'; });
+    aboutModal.addEventListener('click', (e) => {
+      if (e.target === aboutModal) aboutModal.style.display = 'none';
+    });
 
     // --- Resume file upload (PDF, DOCX, TXT) ---
     if (window.pdfjsLib) {
@@ -836,15 +894,6 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    });
-
-    // --- About / version history toggle ---
-    const aboutToggle = document.getElementById('aboutToggle');
-    const versionPanel = document.getElementById('versionPanel');
-    aboutToggle.addEventListener('click', () => {
-      const isOpen = versionPanel.style.display === 'block';
-      versionPanel.style.display = isOpen ? 'none' : 'block';
-      aboutToggle.textContent = isOpen ? 'About ▾' : 'About ▴';
     });
   </script>
 </body>
