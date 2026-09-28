@@ -6,6 +6,11 @@ A web tool that compares a job description against a resume, surfaces the gaps, 
 
 **Live demo:** [jd-to-resume-gap-analyzer.vercel.app](https://jd-to-resume-gap-analyzer.vercel.app)
 
+**Demo Video:**
+<video src="media/ApplyReady_DemoWithText.mp4" controls="controls" style="max-width: 100%;">
+  Your browser does not support the video tag.
+</video>
+
 ## Project Evolution
 
 This started as a small, focused v1 and grew based on actually using it:
@@ -80,7 +85,9 @@ Most resume-JD comparisons are done manually, which means missed keywords and va
 ## Project Structure
 
 ```
-├── index.html          # Frontend UI
+├── index.html          # Frontend UI (HTML)
+├── styles.css          # Styling
+├── script.js           # Frontend Logic
 ├── api/
 │   ├── analyze.js      # Gap analysis — calls the Gemini API
 │   └── rewrite.js       # Resume rewrite — calls the Gemini API
