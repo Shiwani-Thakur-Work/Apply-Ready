@@ -7,9 +7,7 @@ A web tool that compares a job description against a resume, surfaces the gaps, 
 **Live demo:** [jd-to-resume-gap-analyzer.vercel.app](https://jd-to-resume-gap-analyzer.vercel.app)
 
 **Demo Video:**
-<video src="media/ApplyReady_DemoWithText.mp4" controls="controls" style="max-width: 100%;">
-  Your browser does not support the video tag.
-</video>
+https://github.com/Shiwani-Thakur-Work/Apply-Ready/raw/main/media/ApplyReady_DemoWithText.mp4
 
 ## Project Evolution
 
