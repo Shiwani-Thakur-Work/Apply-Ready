@@ -13,3 +13,4 @@ Thumbs.db
 
 # Node (in case I ever add dependencies)
 node_modules/
+media/

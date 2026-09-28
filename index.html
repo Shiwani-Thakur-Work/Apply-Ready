@@ -820,6 +820,7 @@
     generateBtn.addEventListener('click', async () => {
       if (!currentAnalysis) return;
 
+      errorEl.style.display = 'none';
       generateBtn.disabled = true;
       rewriteStatus.style.display = 'block';
       rewriteSection.style.display = 'none';
