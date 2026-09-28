@@ -36,7 +36,7 @@ Analyze the gap between this resume and this JD. Return JSON with this exact sha
 Return 3-5 missing keywords max and 2-3 weak bullets max. Be specific and honest, not generic.`;
 
   try {
-    // Using Gemini 2.5 Flash - fast, free tier, good quality for this task.
+    // Using Gemini 3.6 Flash - fast, free tier, good quality for this task.
     // If this model name changes, check https://aistudio.google.com for current options.
     const model = 'gemini-3.6-flash';
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
