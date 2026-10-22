@@ -33,24 +33,40 @@ Instructions:
 - Do NOT add commentary, notes, or explanations — return ONLY the rewritten resume text`;
 
   try {
-    const model = 'gemini-3.6-flash';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    const candidateModels = ['gemini-3.6-flash', 'gemini-flash-latest'];
+    let response = null;
+    let lastErrText = '';
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.5,
-          maxOutputTokens: 3000
+    for (const model of candidateModels) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.5,
+              maxOutputTokens: 3000
+            }
+          })
+        });
+
+        if (res.ok) {
+          response = res;
+          break;
+        } else {
+          lastErrText = await res.text();
+          console.warn(`Model ${model} failed (${res.status}): ${lastErrText}. Trying next model...`);
         }
-      })
-    });
+      } catch (networkErr) {
+        lastErrText = networkErr.message;
+        console.warn(`Network error with ${model}: ${networkErr.message}`);
+      }
+    }
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error('Gemini API error:', errText);
+    if (!response) {
+      console.error('All Gemini candidate models failed:', lastErrText);
       return res.status(500).json({ error: 'AI provider error' });
     }
 

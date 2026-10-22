@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Matte Obsidian Squircle Base -->
+  <rect width="512" height="512" rx="116" fill="#0c0e14" />
+  <rect width="510" height="510" x="1" y="1" rx="115" stroke="rgba(255, 255, 255, 0.08)" stroke-width="2" />
+
+  <!-- Architectural 'AR' Monogram -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- Left diagonal stem of A -->
+    <path d="M140 376 L244 140" stroke="#cbd5e1" stroke-width="40" />
+
+    <!-- A Crossbar connecting to R -->
+    <path d="M198 274 L296 274" stroke="#ffffff" stroke-width="38" />
+
+    <!-- Center vertical support under crossbar -->
+    <path d="M266 274 L266 376" stroke="#f1f5f9" stroke-width="38" />
+
+    <!-- R Top Header & Rounded Loop -->
+    <path d="M256 140 L318 140 C364 140 382 166 382 206 C382 246 360 274 316 274 L288 274" 
+          stroke="#ffffff" 
+          stroke-width="38" 
+          fill="none" />
+
+    <!-- R Descending Diagonal Leg -->
+    <path d="M296 274 L378 376" stroke="#ffffff" stroke-width="38" />
+  </g>
+</svg>

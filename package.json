@@ -1,5 +1,9 @@
 {
-  "name": "gap-analyzer",
+  "name": "applyready",
   "version": "1.0.0",
-  "private": true
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node dev-server.mjs"
+  }
 }

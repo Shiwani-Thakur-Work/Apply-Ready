@@ -5,79 +5,159 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ApplyReady — Resume Gap Analysis & Rewrite</title>
+
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="ApplyReady — Resume Gap Analysis & Rewrite">
+  <meta name="description" content="Compare your resume against any job description. Uncover missing keywords, rewrite weak bullets, see an honest fit score, and download a tailored resume.">
+  <meta name="keywords" content="resume gap analyzer, resume rewrite, job description matcher, AI resume builder, resume optimizer, ATS keywords">
+  <meta name="author" content="Shiwani Thakur">
+  <meta name="robots" content="index, follow">
+
+  <!-- Favicon & Icons -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="shortcut icon" href="favicon.ico">
+
+  <!-- Theme Color for Mobile & Browser Chrome -->
+  <meta name="theme-color" content="#0c0e14" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f7f8fb" media="(prefers-color-scheme: light)">
+
+  <!-- Open Graph / Facebook / LinkedIn -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jd-to-resume-gap-analyzer.vercel.app/">
+  <meta property="og:title" content="ApplyReady — Resume Gap Analysis & Rewrite">
+  <meta property="og:description" content="From gap analysis to a ready-to-send resume. Uncover missing keywords, rewrite weak bullet points, and export a ready-to-send resume.">
+  <meta property="og:image" content="https://jd-to-resume-gap-analyzer.vercel.app/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="ApplyReady">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://jd-to-resume-gap-analyzer.vercel.app/">
+  <meta name="twitter:title" content="ApplyReady — Resume Gap Analysis & Rewrite">
+  <meta name="twitter:description" content="From gap analysis to a ready-to-send resume. Spot missing keywords, fix weak bullets, and download an improved resume.">
+  <meta name="twitter:image" content="https://jd-to-resume-gap-analyzer.vercel.app/og-image.jpg">
+
+  <!-- Third-party Client Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html-docx-js/dist/html-docx.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <!-- Analytics -->
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
+
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
+  <!-- Header: Classy ApplyReady Brand Logo + Name on left, Controls on right -->
   <header class="site-header">
     <div class="brand">
-      <div class="brand-avatar">ST<img src="profile.jpg" alt="Shiwani Thakur" onerror="this.style.display='none'"></div>
-      <div>
-        <div class="brand-name">Shiwani Thakur</div>
-        <div class="brand-role">Product Manager</div>
-      </div>
+      <img src="favicon.svg" alt="ApplyReady Logo" class="brand-logo" width="28" height="28">
+      <span class="brand-name">ApplyReady</span>
     </div>
     <div class="header-links">
-      <a href="https://github.com/Shiwani-Thakur-Work" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://www.linkedin.com/in/shiwani-thakur/" target="_blank" rel="noopener">LinkedIn</a>
       <button type="button" class="about-link" id="aboutToggle">About</button>
       <button type="button" class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme"></button>
     </div>
   </header>
 
+  <!-- About Modal -->
   <div class="modal-overlay" id="aboutModal">
     <div class="modal-box">
       <button type="button" class="modal-close" id="aboutClose">✕</button>
-      <h3>ApplyReady</h3>
+      <div class="modal-title-row">
+        <img src="favicon.svg" alt="ApplyReady Logo" class="modal-logo" width="24" height="24">
+        <h3>ApplyReady</h3>
+      </div>
       <p class="modal-tagline">From gap analysis to a ready-to-send resume.</p>
       <p>ApplyReady started as a simple idea: instead of manually comparing a resume against a job description, let AI
         point out exactly what's missing — specific keywords, weak bullet points, and an honest fit score.</p>
       <p>It's grown into a full loop: upload a resume, see the gaps, generate an improved version, review it, and
         download it as a PDF or Word document — all in one place.</p>
-      <p> Few more features will be added soon :)</p>
+      <p>Few more features will be added soon :)</p>
     </div>
   </div>
 
   <div class="wrap">
-    <h1>ApplyReady</h1>
-    <p class="subhead">Paste a job description and your resume. Get the exact gaps, weak bullets, and rewrites.</p>
+    <!-- Hero Area: Clean text only, no logo below -->
+    <div class="hero">
+      <h1 class="hero-title">ApplyReady</h1>
+      <p class="subhead">Paste a job description and your resume. Get the exact gaps, weak bullets, and rewrites.</p>
+      <div class="quick-actions">
+        <button type="button" class="action-pill" id="sampleDataBtn">✨ Try Sample Data</button>
+        <button type="button" class="action-pill pill-subtle" id="clearBtn" style="display:none;">Clear All</button>
+      </div>
+    </div>
 
-    <label for="jd">Job Description</label>
+    <!-- Job Description Input -->
+    <div class="field-header">
+      <label for="jd">Job Description</label>
+      <span class="char-count" id="jdCount">0 words</span>
+    </div>
     <textarea id="jd" placeholder="Paste the job description here..."></textarea>
 
-    <label for="resume">Your Resume</label>
-    <div class="upload-row">
-      <button type="button" class="upload-btn" id="uploadBtn">Upload File (PDF, Word, TXT)</button>
+    <!-- Resume Input & Drag-Drop Zone -->
+    <div class="field-header">
+      <label for="resume">Your Resume</label>
+      <span class="char-count" id="resumeCount">0 words</span>
+    </div>
+    <div class="upload-row" id="dropZone">
+      <button type="button" class="upload-btn" id="uploadBtn">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        Upload File (PDF, Word, TXT)
+      </button>
       <input type="file" id="fileInput" accept=".pdf,.docx,.txt" style="display:none;">
       <span class="file-name" id="fileName"></span>
     </div>
-    <p class="or-divider">— or paste directly below —</p>
+    <p class="or-divider">— or drag & drop / paste directly below —</p>
     <p class="parse-status" id="parseStatus">Reading file...</p>
-    <textarea id="resume" placeholder="Paste your resume text here..."></textarea>
+    <textarea id="resume" placeholder="Paste your resume text here (or drag & drop your PDF/Word file)..."></textarea>
 
-    <button id="analyzeBtn">Analyze Gap</button>
-    <p id="status">Analyzing...</p>
+    <!-- Analyze CTA -->
+    <button id="analyzeBtn" class="primary-btn">
+      <span class="btn-text">Analyze Gap</span>
+    </button>
+
+    <!-- Sleek Loading State -->
+    <div id="status" class="status-container">
+      <div class="loading-spinner"></div>
+      <span id="statusMessage">Analyzing match & extracting requirements...</span>
+    </div>
     <p id="error" class="error"></p>
 
+    <!-- Results Section -->
     <div id="results">
       <div class="card" id="scoreCard">
         <div class="score-row">
           <div class="score-badge" id="scoreBadge">-</div>
-          <strong>Fit Score</strong>
+          <div>
+            <strong>Fit Score</strong>
+            <div class="score-bar-track">
+              <div class="score-bar-fill" id="scoreBarFill"></div>
+            </div>
+          </div>
         </div>
         <p class="fit-summary" id="fitSummary"></p>
       </div>
 
       <div class="card">
-        <h2 class="section-title">Missing Keywords</h2>
+        <div class="card-head">
+          <h2 class="section-title">Missing Keywords</h2>
+          <button type="button" class="mini-tool-btn" id="copyKeywordsBtn" title="Copy keywords to clipboard">Copy all</button>
+        </div>
         <div class="chips" id="keywordChips"></div>
       </div>
 
@@ -86,17 +166,27 @@
         <div id="bulletsContainer"></div>
       </div>
 
-      <button id="generateResumeBtn" class="secondary-btn">Generate Improved Resume</button>
-      <p id="rewriteStatus">Rewriting your resume...</p>
+      <button id="generateResumeBtn" class="secondary-btn">
+        <span>Generate Improved Resume</span>
+      </button>
+
+      <div id="rewriteStatus" class="status-container">
+        <div class="loading-spinner"></div>
+        <span>Rewriting your resume to address gaps...</span>
+      </div>
 
       <div id="rewriteSection" class="card">
-        <h2 class="section-title">Improved Resume (review before downloading)</h2>
+        <div class="card-head">
+          <h2 class="section-title">Improved Resume (review before downloading)</h2>
+          <button type="button" class="mini-tool-btn" id="copyResumeTopBtn" title="Copy full resume text">Copy</button>
+        </div>
         <p class="review-note">This is AI-generated — review it carefully. Fix anything that sounds off before
           downloading, especially if you plan to use the PDF as-is.</p>
         <textarea id="rewriteTextarea"></textarea>
         <div class="download-row">
           <button id="downloadPdfBtn" class="download-btn pdf-btn">Download as PDF</button>
           <button id="downloadWordBtn" class="download-btn word-btn">Download as Word</button>
+          <button id="copyResumeBtn" class="download-btn copy-btn">Copy Text</button>
         </div>
         <p class="review-note">PDF: use when it looks good as-is. Word: use when you want to manually tweak formatting
           or wording afterward.</p>
@@ -104,8 +194,33 @@
     </div>
   </div>
 
-  <footer>
-    Built as a personal/portfolio project · <a href="mailto:shiwani.thakur.work@gmail.com">Get in touch</a>
+  <!-- Toast Notification Feedback -->
+  <div id="toast" class="toast">Copied to clipboard</div>
+
+  <!-- Professional Footer with Shiwani's PM Portfolio Info & Links -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-main">
+        <div class="footer-brand-row">
+          <span class="footer-brand-name">ApplyReady</span>
+          <span class="footer-pill">Product Showcase</span>
+        </div>
+        <p class="footer-bio">
+          Conceived and built by <strong>Shiwani Thakur</strong> · Product Manager specializing in 0→1 products, AI workflows, and technical platforms. Designed to help candidates identify real skill gaps, strengthen bullet points, and prepare role-tailored resumes.
+        </p>
+      </div>
+      <div class="footer-links-col">
+        <span class="footer-col-title">Connect</span>
+        <div class="footer-links-group">
+          <a href="https://www.linkedin.com/in/shiwani-thakur/" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="https://github.com/Shiwani-Thakur-Work" target="_blank" rel="noopener">GitHub</a>
+          <a href="mailto:shiwani.thakur.work@gmail.com">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 ApplyReady · Free to use, no sign-up required.</span>
+    </div>
   </footer>
 
   <script src="script.js" defer></script>

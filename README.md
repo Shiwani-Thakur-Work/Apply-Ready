@@ -75,21 +75,25 @@ Most resume-JD comparisons are done manually, which means missed keywords and va
    - Variable name: `GEMINI_API_KEY`
    - Value: your key from step 2
 
-4. Or run locally with the Vercel CLI:
+4. Or run locally:
    ```
-   npm install -g vercel
-   vercel dev
+   npm run dev
    ```
+   *(or with Vercel CLI: `vercel dev`)*
 
 ## Project Structure
 
 ```
-├── index.html          # Frontend UI (HTML)
-├── styles.css          # Styling
-├── script.js           # Frontend Logic
+├── index.html          # Frontend UI (HTML) with complete OpenGraph & SEO tags
+├── styles.css          # Styling (Light/Dark themes, responsive minimal layout)
+├── script.js           # Frontend logic (file parsing, analysis, rewrite, export)
+├── dev-server.mjs      # Local zero-dependency dev server
+├── favicon.svg         # Architectural AR brand mark
+├── og-image.jpg        # Social preview banner (Open Graph & Twitter)
+├── site.webmanifest    # Web app manifest
 ├── api/
-│   ├── analyze.js      # Gap analysis — calls the Gemini API
-│   └── rewrite.js       # Resume rewrite — calls the Gemini API
+│   ├── analyze.js      # Gap analysis with automated Gemini model fallback
+│   └── rewrite.js      # Resume rewrite with automated Gemini model fallback
 └── package.json
 ```
 
